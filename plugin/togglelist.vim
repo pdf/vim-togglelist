@@ -21,18 +21,12 @@ function! s:GetBufferList()
 endfunction
 
 function! ToggleLocationList()
-  let curbufnr = winbufnr(0)
   for bufnum in map(filter(split(s:GetBufferList(), '\n'), 'v:val =~ "Location List"'), 'str2nr(matchstr(v:val, "\\d\\+"))')
-    if curbufnr == bufnum
-      lclose
-      return
-    endif
+    lclose
+    return
   endfor
 
   let winnr = winnr()
-  let prevwinnr = winnr("#")
-
-  let nextbufnr = winbufnr(winnr + 1)
   try
     lopen
   catch /E776/
@@ -41,19 +35,9 @@ function! ToggleLocationList()
       echohl None
       return
   endtry
-  if winbufnr(0) == nextbufnr
-    lclose
-    if prevwinnr > winnr
-      let prevwinnr-=1
-    endif
-  else
-    if prevwinnr > winnr
-      let prevwinnr+=1
-    endif
+  if winnr() != winnr
+    wincmd p
   endif
-  " restore previous window
-  exec prevwinnr."wincmd w"
-  exec winnr."wincmd w"
 endfunction
 
 function! ToggleQuickfixList()
